@@ -1,11 +1,13 @@
 ﻿<script setup>
 /* eslint-disable vue/no-v-for-template-key-on-child */
-import { defineProps, ref, onMounted } from "vue";
+import { defineProps, ref, onMounted, computed, onUnmounted } from "vue";
 import { SmartWidgetGrid } from "vue-smart-widget";
 import { WidgetCard } from "@/components/WidgetCard";
 import { Button } from "@/components/Button";
 import { Modal } from "@/components/Modal";
 import { ContextMenu } from "@/components/ContextMenu";
+import TreeData from "@/components/TreeData";
+import AdvancedFilter from "@/components/AdvancedFilter";
 import Search from "@/components/Search";
 import {
   IconModeEdit,
@@ -23,10 +25,33 @@ const props = defineProps({
 const isEditMode = ref(false);
 const isShowAddNew = ref(false);
 const items = ref([]);
+const rowHeight = ref(38);
+const filteredData = ref([]);
+const windowWidth = ref(window.innerWidth);
+
+// watch(
+//   () => windowWidth,
+//   (newValue) => {
+//     console.log(newValue)
+//   }
+// );
+
+// const type = computed(() => {
+//   if (windowWidth.value < 550) return 'xs'
+//   if (windowWidth.value >= 550 && windowWidth.value < 1200) return 'md'
+//   if (windowWidth.value >= 1200) return 'lg'
+//   return null; // This is an unreachable line, simply to keep eslint happy.
+// })
+
+// const width = computed(() => windowWidth.value)
+
+const rowHeightComputed = computed(() => {
+  return rowHeight.value;
+});
 
 const onClickEditHandler = () => {
   isEditMode.value = !isEditMode.value;
-  console.log('refs', ContextMenu)
+  console.log("refs", ContextMenu);
 };
 
 const onWidgetCloseHandler = (item) => {
@@ -37,18 +62,105 @@ const onWidgetCloseHandler = (item) => {
 const addWidgetHandler = (item) => {
   items.value.push(item);
 };
-
-const filteredData = ref([]);
+const onWidthChange = () => {
+  windowWidth.value = window.innerWidth;
+  console.log(windowWidth.value);
+};
 
 // lifecycle hooks
 onMounted(() => {
   items.value = props.layout;
+  window.addEventListener("resize", onWidthChange);
 });
+onUnmounted(() => window.removeEventListener("resize", onWidthChange));
 
-// const onClickContextHandler = () => {
-//   isEditMode.value = !isEditMode.value;
-//   console.log('refs', ContextMenu)
-// };
+
+
+
+const treeData = ref([
+  {
+    name: "Israel",
+    children: [
+      {
+        name: "DEMO",
+        children: [{ name: "Fedor_Demo" }],
+      },
+    ],
+  },
+  {
+    name: "DEMO",
+    children: [
+      {
+        name: "DEMO",
+        children: [{ name: "Fedor_Demo" }],
+      },
+    ],
+  },
+  {
+    name: "DEMO",
+    children: [
+      {
+        name: "DEMO",
+        children: [{ name: "Fedor_Demo" }],
+      },
+    ],
+  },
+  {
+    name: "DEMO",
+    children: [
+      {
+        name: "DEMO",
+        children: [{ name: "Fedor_Demo2", categories: [ "postpaid" ]}],
+      },
+    ],
+  },
+  {
+    name: "DEMO",
+    children: [
+      {
+        name: "DEMO1",
+        categories: [ "prepaid" ],
+        children: [{ name: "Fedor_Demo_payment" }],
+      },
+    ],
+  },
+]);
+const categories = ref([
+    {
+      id: "paymentType",
+      name: "Payment type",
+      inputType: "select",
+      options: [
+        {title: "Prepaid", value: "prepaid", selected: "checked"},
+        {title: "Postpaid", value: "postpaid", selected: "unchecked"}
+      ]
+    },
+    {
+      id: "rateType",
+      name: "Rate type",
+      inputType: "select",
+      options: [
+        {title: "Placeholder", value: "Placeholder", selected: "checked"},
+        {title: "Area", value: "Area", selected: "unchecked"}
+      ]
+    },
+    {
+      id: "connectionType",
+      name: "Connection type",
+      inputType: "select",
+      options: [
+        {title: "Wifi", value: "Wifi", selected: "checked"},
+        {title: "Lan", value: "Lan", selected: "unchecked"}
+      ]
+    },
+    {
+      id: "netMetering",
+      name: "Net metering",
+      inputType: "input",
+      value: "meter"
+    },
+]);
+const filteredTree = ref([]);
 </script>
 
 <template>
@@ -56,24 +168,38 @@ onMounted(() => {
     <div :class="$style.gridHeader">
       <div :class="$style.mbL">
         <h4 :class="[$style.title4, $style.mbXSS]">Recently Used</h4>
-        <Button title="Inventory" color="purple" size="M" outline></Button>
-        <Button title="Workorder" color="purple" size="M" outline></Button>
-        <Button title="Assets" color="purple" size="M" outline></Button>
-        <Button title="Commands" color="purple" size="M" outline></Button>
-        <Button
-          title="Command Results"
-          color="purple"
-          size="M"
-          outline
-        ></Button>
-        <Button title="Alerts/Vee" color="purple" size="M" outline></Button>
+        <div :class="$style.btnControlsWrapper">
+          <Button title="Inventory" color="purple" size="M" outline responsive></Button>
+          <Button title="Workorder" color="purple" size="M" outline responsive></Button>
+          <Button title="Assets" color="purple" size="M" outline responsive></Button>
+          <Button title="Commands" color="purple" size="M" outline responsive></Button>
+          <Button
+            title="Command Results"
+            color="purple"
+            size="M"
+            outline
+            responsive
+          ></Button>
+          <Button title="Alerts/Vee" color="purple" size="M" outline responsive></Button>
+        </div>
       </div>
       <div :class="[$style.mbXSS, $style.flex]">
-        <h4 :class="[$style.title4]">Current Area: <span @contextmenu.prevent="$refs.menu.open">Fedor_Demo</span></h4>
-        <ContextMenu ref="menu">
-          dcdfdfdsfds
-        </ContextMenu>
-        <IconArrowDropDown height="12" width="12" />
+        <h4 :class="[$style.title4]">
+          Current Area:
+          <span @contextmenu.prevent="$refs.menu.open">Fedor_Demo</span>
+        </h4>
+        <ContextMenu>
+         <template #activator>
+          <IconArrowDropDown height="12" width="12" />
+         </template>
+         <template #content>
+            <h4 :class="[$style.title4, $style.mbXS]">Areas</h4>
+            <div :class="[$style.mbXS]">
+              <AdvancedFilter v-model="filteredTree" :data="treeData" :categories="categories"/>
+            </div>
+            <TreeData :items="filteredTree" />
+         </template>
+         </ContextMenu>
       </div>
       <div :class="[$style.flex, $style.justifyBetween]">
         <Button title="View details" color="purple" size="M">
@@ -118,7 +244,7 @@ onMounted(() => {
         resizable
         :margin="[24, 24]"
         :cols="{ lg: 10, md: 10, sm: 8, xs: 4, xxs: 2 }"
-        :rowHeight="41"
+        :rowHeight="rowHeightComputed"
       >
         <template v-for="item in items" v-slot:[item.i]>
           <WidgetCard

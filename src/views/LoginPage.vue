@@ -1,11 +1,17 @@
-﻿<script>
-export default {
-  name: 'LoginPage',
-  props: {
-    msg: String
-  }
-}
+﻿<script setup>
+import LoginForm from "@/components/LoginForm";
+
 </script>
 <template>
-    <div>Login</div>
+    <div>
+      <LoginForm />
+    </div>
 </template>
+
+<style lang="scss" module>
+@import "@/assets/styles/utils.module";
+</style>
+
+<style lang="scss" scoped>
+
+</style>

@@ -12,7 +12,7 @@ const router = createRouter({
       path: "/",
       component: HomePage,
       meta: {
-        layout: 'default-layout',
+        layout: 'home-layout',
         breadcrumb: [
           {
             text: 'Home'
@@ -23,6 +23,9 @@ const router = createRouter({
     {
       path: "/login",
       component: LoginPage,
+      meta: {
+        layout: 'login-layout',
+      }
     },
     {
       path: "/dashboard",

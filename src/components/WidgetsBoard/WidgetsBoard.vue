@@ -21,6 +21,10 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  aviableWidgets: {
+    type: Array,
+    default: ()=> []
+  }
 });
 const isEditMode = ref(false);
 const isShowAddNew = ref(false);
@@ -51,7 +55,6 @@ const rowHeightComputed = computed(() => {
 
 const onClickEditHandler = () => {
   isEditMode.value = !isEditMode.value;
-  console.log("refs", ContextMenu);
 };
 
 const onWidgetCloseHandler = (item) => {
@@ -193,11 +196,12 @@ const filteredTree = ref([]);
           <IconArrowDropDown height="12" width="12" />
          </template>
          <template #content>
-            <h4 :class="[$style.title4, $style.mbXS]">Areas</h4>
+           <div :class="$style.contextMenuContent">
             <div :class="[$style.mbXS]">
               <AdvancedFilter v-model="filteredTree" :data="treeData" :categories="categories"/>
             </div>
             <TreeData :items="filteredTree" />
+           </div>
          </template>
          </ContextMenu>
       </div>
@@ -243,7 +247,7 @@ const filteredTree = ref([]);
         responsive
         resizable
         :margin="[24, 24]"
-        :cols="{ lg: 10, md: 10, sm: 8, xs: 4, xxs: 2 }"
+        :cols="{ lg: 10, md: 8, sm: 8, xs: 4, xxs: 2 }"
         :rowHeight="rowHeightComputed"
       >
         <template v-for="item in items" v-slot:[item.i]>
@@ -278,9 +282,11 @@ const filteredTree = ref([]);
           <div :class="[$style.mbS, $style.controls]">
             <Search
               v-model="filteredData"
-              :data="props.layout"
+              :data="props.aviableWidgets"
+              searchField="title"
               outline
-            ></Search>
+            >
+            </Search>
           </div>
         </template>
         <template #body>
@@ -288,7 +294,7 @@ const filteredTree = ref([]);
             <div
               v-for="item in filteredData"
               :key="item.id"
-              :class="$style.previewGridItem"
+              :class="[$style.previewGridItem, $style[item.template]]"
             >
               <WidgetCard
                 :key="item.id"

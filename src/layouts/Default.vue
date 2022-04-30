@@ -23,7 +23,6 @@ const currentUser = {
 };
 const isSidebarOpened = ref(true);
 const onCloseClickHandler = (event) => {
-  console.log(event)
   isSidebarOpened.value = event;
 };
 
@@ -183,6 +182,7 @@ const latestActivities = ref([
     <aside>
       <LatestActivities :items="latestActivities" />
     </aside>
+    <footer></footer>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -221,8 +221,8 @@ main {
   .container {
     height: 100vh;
     grid-template-columns: auto 2fr 0.6fr;
-    grid-template-rows: 0.2fr 1.5fr;
-    grid-template-areas: "nav nav nav" "sidemenu main aside";
+    grid-template-rows: 64px 1.5fr 56px;
+    grid-template-areas: "nav nav nav" "sidemenu main aside" "footer footer footer";
     grid-gap: 0 24px;
   }
   .container.sidebar-opened {
@@ -235,6 +235,17 @@ main {
   }
   aside.menu {
     width: 48px;
+  }
+  main {
+    padding: 0;
+  }
+  footer {
+
+  }
+}
+@media only screen and (min-width: 1200px) {
+  .container {
+    grid-template-rows: 96px 1.5fr;
   }
 }
 </style>
